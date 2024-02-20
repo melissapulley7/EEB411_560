@@ -1,0 +1,348 @@
+---
+title: "L2. Lab:Intro to R and Data Description"
+author: "Dr. Alejandro Molina-Moctezuma; based (and modified) on prior EEB411 professors"
+date: "2024-01-23"
+output: pdf_document
+header-includes:
+  - \usepackage{awesomebox}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\notebox{You will need to submit the CSV file, and your code. You can answer the questions by annotating your answers in the code, or, if you prefer by uploading a word document}
+
+\importantbox{These boxes will inform you of things you need to submit or questions you need to answer!}
+
+## 1 Introduction
+
+Some of you may have heard of R, used R, and are even experts in the R coding language, while others might not even have heard of it. My aim in this class is for you all to be functional, proficient users of R and acquire the skills to (1) perform commonly-used analyses in ecology and related fields and (2) have a good statistical foundation to explore and understand approaches that are less common but may eventually be needed in your work.
+
+Today we will begin with the first task you might be asked to do if you work in a lab as a research assistant or technician: data entry! You might think data entry is easy but it takes some thought as to how you would enter data from a data sheet that came straight from the field/lab into an Excel spreadsheet on your computer.
+
+Hopefully, the short presentation was useful!
+
+## 2 Data entry
+
+Download and open the files, Crab_GTM.jpg, Crab_VCR.jpg, Crab_NIB.jpg, and Crab_PIE.jpg. These files comprise data that researchers have collected by sampling and measuring Atlantic marsh fiddler crabs (*Minuca pugnax*) at four marshes along the US Atlantic coast. The air temperature (from nearby weather stations) and latitude are also recorded on the data sheets.
+
+
+\notebox{For the following section, I encourage you to discuss, and work with your peers! In general, you are allowed to discuss and help each other, but the answer and documents submitted MUST be yours!}
+
+Enter data of the location, latitude of location, air temperature of location, size (carapace width) of all individual fiddler crabs into an Excel spreadsheet. Think about how you would enter the information and share/discuss your thoughts with your neighbors. 
+
+![Fiddler crab; credit: E.A. Lazo-Wasem](C:/Users/amolina6/OneDrive - University of Tennessee/Documents/projects/EEB411_560/figures/L1/Picture1.jpg){width=25%}
+
+Enter data of the location, latitude of location, air temperature of location, size (carapace width) of all individual fiddler crabs into an Excel spreadsheet. Think about how you would enter the information and share/discuss your thoughts with your neighbors. 
+
+Save the spreadsheet as a .csv file named **FiddlerCrabData.csv** into a new directory named **EEB411_560**. 
+
+\importantbox{Upload the $.csv$ file to Canvas as part of your assignment (2pts)}
+
+
+\notebox{Make a (mental) note of where (in the directory) you saved your file!}
+
+## 3 Using R
+
+### 3.1 Importing Data
+
+You can import data of various formats into R; they include data tables in the form of .dbf, .csv, and .xlsx files or even spatial data such as vectors (.shp) or rasters (.nc).
+
+But the most common type of data files imported into R are probably .csv files, which you have created in the last section.
+
+You can import the dataset using the function read.csv()
+
+
+Now, let's import the dataset!
+
+
+----
+
+\notebox{You will need to submit your code, so, if you are using RStudio write your code in the source window (figure 2). This way your code is saved. Your RStudio might look different. Just make sure it is the source window and not the console!!!}
+
+
+![RStudio panes. Your RStudio might look different](C:/Users/amolina6/OneDrive - University of Tennessee/Documents/projects/EEB411_560/figures/L1/RStudio.png){width=50%}
+
+
+---
+
+The way **I** did it, was by typing the following in the **code editor (or source window)**:
+Do not write code directly in the console!!!!!
+
+
+```{r eval=FALSE}
+read.csv("~/projects/EEB411_560/L2/FiddlerCrabData.csv")
+```
+
+but, the way **YOU** will do it, is slightly different. You need to tell R where your file is located. Yours might look something like: 
+
+```{r eval=FALSE}
+read.csv('~/EEB411_560/FiddlerCrabData.csv') # if mac
+read.csv('C:/Users/YourUserID/FiddlerCrabData.csv') # if windows or
+read.csv('~/FiddlerCrabData.csv') #if windows saved in "my documents"
+```
+How do you find the file path? For mac, open Finder, click to the folder where you saved your data, find your file, right-click (or ctrl-click) it, and then click on GetInfo. **I am not a Mac user, so be patient with me**
+
+For windows, find the file on explorer and copy the path.
+
+\notebox{Please note that R requires a forward slash "/" while windows usually copies a backslash!}
+
+Once you have identified your path, you can import your file! Hopefully, after you import it, it looks something like this:
+
+```{r}
+read.csv("~/projects/EEB411_560/L2/FiddlerCrabData.csv")
+```
+
+If it doesn't, now is the time for you to ask for help (ither from the internet, from your peers, a TA or your instructor).
+
+\importantbox{I hate to be repetitive... But! Write all the code in the editor (or in any code editor you use, like notepad++), you will have to submit it}
+
+This is also called a data frame in R. Typing the function read.csv() prints out the data frame but it doesn’t store it in a format that can be further manipulated in R. What we want to do is to place this data in an R object. You can place any information (a number, a vector of numbers, a vector of character strings, data frames, matrices, spatial data etc.) in an R object using <-
+
+
+
+```{r}
+CrabDat <- read.csv("~/projects/EEB411_560/L2/FiddlerCrabData.csv")
+```
+
+now, there is an object called CrabDat. 
+What happens when you run the following functions?:
+
+```{r eval=FALSE}
+print(CrabDat)
+```
+
+And what happens when you run 
+```{r eval=FALSE}
+print(head(CrabDat)) #what is this?
+```
+
+What are those functions (print) and (head) doing?
+
+\awesomebox[red]{2pt}{\faQuestion}{red}{Question! Describe the function print() and the function head(). 1 pt}
+
+If you are not sure, try one of my favorite functions in R: the help function!
+
+Run:
+```{r eval=FALSE}
+?head #?is a great function!
+```
+And see what it does. You can run that (?) with any function! It is super helpful!
+
+\notebox{\# allows us to annotate code. Nothing that's past the \# is run!}
+
+
+### 3.2 Data exploration
+
+Let's start with exploring the data!
+First, let's look at a summary!
+
+```{r eval=FALSE}
+summary(CrabDat)
+```
+
+
+\awesomebox[red]{2pt}{\faQuestion}{red}{Question! Based on the summary function, summarize your data in a couple lines  and describe what this function (summary) does. 2 pts}
+
+You can also explore the dimensions of the data frame using the function dim(). Try this:
+
+```{r eval=FALSE}
+dim(CrabDat) 
+```
+
+What do you think each number represents?
+
+Why are these numbers important? The number of rows give you information on the sample size, i.e., the total number of observations or “data points”. The number of columns tell you how many variables, i.e, different information, recorded for each observation or data point.
+
+Also try this:
+```{r eval=FALSE}
+nrow(CrabDat) # what is this? Is the name of the function intuitive?
+ncol(CrabDat) # what is this? Is the name of the function intuitive?
+```
+
+To see the names of columns, i.e., names of variables recorded, you can do this:
+```{r eval=FALSE}
+names(CrabDat)
+```
+
+names(CrabDat) is a vector. A vector is a one-dimensional series of elements. In this case, you can see four elements – each of them the name of a column in CrabDat. CrabDat has 4 columns/variables so it makes sense to get 4 column/variable names.
+
+To retrieve a specific element of a vector (i.e., xth element), you’d need to add [x] to add the end of names(CrabDat), therefore for the 4th element of names(CrabDat), try:
+
+```{r eval=FALSE}
+names(CrabDat)[4] # does it make sense to you?
+names(CrabDat) # check the previous answer against this. Makes sense?
+```
+
+If you want to rename one column, try
+```{r eval=FALSE}
+names(CrabDat)[4] <-air.temp  #previously air_temp in my example
+```
+
+The square brackets [] also apply to other types of R objects, such as data frames. Unlike vectors, data frames are two-dimensional: i.e., there are columns as well as rows. Often each row is an observation, while columns describe the different types of data/variables recorded for each observation. The value of a one variable recorded for a given individual is an element.
+
+See the abbreviated CrabDat data frame for a graphical explanation (figure 2)
+
+![CrabDat dataframe](C:/Users/amolina6/OneDrive - University of Tennessee/Documents/projects/EEB411_560/figures/L1/Picture2.jpg){width=90%}
+
+To retrieve data for a specific row (i.e, the ith row), use [i,] immediately after CrabDat. So if you want to retrieve data for the first row (which is all the information available for observation #1), you can type this:
+
+```{r eval=FALSE}
+CrabDat[1,] # note position of i or 1 in this case. It is left of the comma.
+```
+
+To retrieve data for a specific column (i.e, the pth column), use [,p] immediately after CrabDat. So if you want to retrieve data for the first column (values of the first variable – site – recorded for all observations), you can type this:
+
+```{r eval=FALSE}
+CrabDat[,1] # note position of p or 1 in this case. It is right of the comma.
+```
+
+If you want to retrieve the value of the 3rd column belonging to the 6th observation/row (which is the value contained within the orange box above), you can type this:
+
+```{r eval=FALSE}
+CrabDat[6,3] # row position is left of comma, column pos. is right of comma
+```
+
+\importantbox{Write code to retrieve the size of the 10th observation. What is the size in mm? 1 pt}
+
+\importantbox{Write code to retrieve the latitude of the 2nd observation. Write code to retrieve all data (site, latitude, size, and air temperature) from the third observation. 2 pts}
+
+You can extract multiple columns and rows of CrabDat if you want to. The idea is to concatenate the different numbers referring to the row and column positions you want, using c(). For example:
+
+```{r}
+c(1,2,4) # this prints 1, 2, and 4
+```
+
+Look (and run, the following three code chunks)
+
+
+```{r eval=FALSE}
+CrabDat[c(1,2,4), 3] # note that c(1,2,4) is left of the comma
+```
+
+```{r eval=FALSE}
+CrabDat[1:5, 3] 
+```
+
+
+```{r eval=FALSE}
+1:5 
+```
+
+\importantbox{Describe what each of the last three code chunks did1 pt}
+
+
+Another way of retrieving data for a specific column or variable is to use $VarName immediately after CrabDat, where VarName is the name of the column/variable. So to retrieve measurements of size for all fiddler crab individuals in the data set, you can type:
+
+```{r eval=FALSE}
+CrabDat$size # since ‘size’ is the name of the variable you want
+```
+
+You can also do this to get the same information as above (size of first five individuals):
+
+```{r eval=FALSE}
+CrabDat$size[1:5]
+```
+
+\awesomebox[red]{2pt}{\faQuestion}{red}{Question! Why is there no comma within the square brackets [  ]? 1 pt. It's ok to ask us for hints!!!}
+
+\awesomebox[red]{2pt}{\faQuestion}{red}{Question! Write code to retrieve the air temperature associated with the first 10 individuals. Does it make sense to you that the air temperature values are all the same along the first 10 individuals? Why? [2 pts]}
+
+
+### 3.3	Beginning to describe and visualize data
+
+Obviously, we are just scratching the surface of data processing in the previous section. These are the basic building blocks, which I hope will help you learn different ways of processing data in R in the future. We will come back to this in future tutorials and you’d realize that there is often many ways of doing the same thing in R.
+
+Now let’s move on to simple data description and visualization. We will briefly cover some of these topics in the future, but I want you all to get an intuition by doing first.
+
+### 3.4	Types of data
+
+There are two main data/variable types: (1) categorical or qualitative data; and (2) numerical or quantitative data.
+
+In CrabDat, which variables (columns) are categorical and which ones are numeric?
+
+```{r}
+summary(CrabDat)
+```
+
+If a variable has information like mean, median, or max, it is numerical/quantitative data. The variable site is shown as a character variable. This is an example of categorical or qualitative data. It makes sense, as each code refers to a given site where crabs were sampled.
+
+You can formally define site as a categorical (factor) variable using as.factor
+
+```{r}
+CrabDat$site <- as.factor(CrabDat$site)
+```
+
+Now run a summary()of CrabDat again. What does it say under site now?
+
+```{r}
+summary(CrabDat) # is there more information now?
+```
+
+See the new information!
+
+### 3.5.	Describing and visualizing different types of data
+
+Categorical/qualitative data are data that do not have magnitude that can be measured by numbers (i.e., not quantitative). Categorical data include assignments of samples/individuals/observations into groups or categories. For example, the type of high-schools in the US can be classified into public vs. private high schools. There are two discrete categories: public or private. Therefore this is a categorical variable.
+
+In CrabDat, site is categorical. We can summarize categorical variables by using table()
+
+```{r}
+table(CrabDat$site)
+```
+
+The printed output counts the number of observations belonging to each category of the site variable.
+
+Numeric/quantitative data are data that have magnitude and they can be described numerically. Larger values of a given quantitative variable have a larger magnitude than smaller values of the same variable. For example, the mean ACT score of seniors in a given high school is a numeric/quantitative variable.
+
+In CrabDat, size, air_temp, and latitude are numeric/quantitative variables.
+
+For quantitative variables, we can plot a histogram to visualize the distribution (or spread) of values. In R, we can use hist()
+
+```{r}
+hist(CrabDat$size) # what do you think of the distribution
+```
+
+We can use breaks=n to change the number of breaks. Look at:
+```{r eval=F}
+?hist
+```
+
+and then run:
+
+```{r eval=FALSE}
+hist(CrabDat$size, breaks=x) # what do you think of the distribution
+```
+But replace x for an appropriate number. 
+
+\importantbox{Upload your plot with an appropriate number of breaks to Canvas. Justify why you chose those breaks. 1pt}
+
+You can also use boxplots to visualize the spread of a given variable across different categories of another categorical variables. Here, we want to visualize the distribution of individual crab sizes across different sites using boxplot().
+
+```{r}
+boxplot(size~site, data=CrabDat) # what do you think?
+						
+```
+\awesomebox[red]{2pt}{\faQuestion}{red}{Question! what do the lines and boxes represent? [1 pt]}
+
+
+Last, for this tutorial, sometimes we want to visualize the relationship between two quantitative variables. The quickest way to do this is to make a dot plot (scatterplot) using plot()
+
+```{r}
+plot(size~latitude, data=CrabDat) # what do you think?
+				
+```
+
+\importantbox{Write code to make a plot of size (y-axis) against air temperature (x-axis). You decide what type of plot to present (dot plot or boxlplot), and explain why you made that choice. 2pts}
+
+
+
+
+---
+
+
+\awesomebox[violet]{5pt}{\faRocket}{violet}{EXTRA CREDIT (1 pt) CREATE A "PUBLICATION QUALITY PLOT". Research online, and figure out how to manipulate some of the graphical parameters (e.g. size of points, color, thickness of lines, etc.) Using the fiddler crab data, make a pretty plot that is of "publication quality" (i.e., a plot that could be on a research paper). Add an appropriate figure legend (read other papers to see what they include in a figure legend)}
+
