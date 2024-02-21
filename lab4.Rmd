@@ -72,7 +72,7 @@ upperCI <- X_bar + qt(0.975, df=n-1)*s/sqrt(n)
 ```
 
 
-OK, now, assume we have a second population of the Green Floater mussel in a different body of water. This population has 1,819 mussels. You believe that the lower abundance (and in this case, lower density) of mussels results in a larger size. The real population size is represented $X \sim N(\mu = 41.6, \sigma = 6)$
+OK, now, assume we have a second population of the Green Floater mussel in a different body of water. This population has 1,819 mussels. You believe that the lower abundance (and in this case, lower density) of mussels results in a larger size. The real population length parameter is represented $X \sim N(\mu = 41.6, \sigma = 6)$
 
 
 First, let's simulate this second population
@@ -347,7 +347,35 @@ However, if you explore the dataset, you see that we have information on ice-cov
 
 If you are eager for more work, you can get some extra credit. Check the Resources, extra credit and sample code section of the lab.
 
-Lab total: 32 pts
+## Categorical linear model and Anova
+
+You are almost done with this lab! :) Just a couiple more questions.
+
+\notebox{These two questions are regarding a topic we will see on Friday! Check that presentation if you have any questions}
+
+Download the mthreepops.csv file and load it in an object called dat2.
+
+Explore the dataframe (using head or summary) so you understand it. 
+We are back to working with mussels. In this case you have samples from **3** populations, and you wonder if there are differences in sizes.
+
+To do this, first run a linear model, and check the summary
+
+```{r eval =FALSE}
+m2<-lm(Length~Site,data=Musselsthreepops, data=dat2)
+summary(m2)
+``` 
+
+\importantbox{Q10. 2 pts. Look at the model summary, and interpret the results. Is any population different? Which one has the largest mean size and which one the smallest length size?}
+
+Now, let's run an ANOVA. This is very simple in R
+
+```{r eval =FALSE}
+anova(m2)
+``` 
+
+\importantbox{Q10. 2 pts. State the null and alternative hypotheses. Decide whether to reject or fail to reject your null hypothesis, and explain what this means biologically}
+
+Lab total: 36 pts
 
 ---   
 end of lab
