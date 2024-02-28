@@ -8,7 +8,7 @@ header-includes:
   - \usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
 ---
 
-## First exam
+# First exam
 
 This first exam will be an in-class, Canvas exam. I recommend you bring the following items to the exam:
 
@@ -22,13 +22,13 @@ The exam **IS NOT** open book. You will **NOT** be asked to code, but you might 
 
 The exam will have an access code.
 
-### What type of questions will there be?
+## What type of questions will there be?
 
 The exam will have multiple choice, fill in the blank, short answers, very basic math questions, etc. While knowing definitions is important, the focus will be on critical thinking and *understanding concepts* and being able to apply that understanding when presented with scenarios.
 
 You can email me if you have questions about this guide. If you need help with a specific topic or questions, email me, and we can meet on Wednesday 6th during class hours.
 
-## About this guide
+# About this guide
 
 This guide is meant to help you study by:
 
@@ -39,9 +39,9 @@ This guide is meant to help you study by:
 
 The guide lists the concepts and definitions you should understand, but it doesn't explain them. You should check the lecture material and the labs in order to find the explanations/definitions. You are also welcome to check any order books or online explanations (I recommend the ones in the syllabus!)
 
-## Guide for exam 1
+# Guide for exam 1
 
-### Basic Definitions, types of data, and data visualization
+## Basic Definitions, types of data, and data visualization
 
 Understand the basic concepts and definitions that we use in statistics. *Note: It's more important to understand the definitions that to memorize them!* Examples of concepts and definitions you need to understand are:
 
@@ -108,7 +108,7 @@ boxplot(size~site, data=CrabDat)
 
 \importantbox{Q5. 2 pts. Mention one site that is "skewed left" in the Fiddler Crab boxplot. Mention what site has the largest IQR, and which value is higher: NIB's 50th percentile, or VCR's 25th percentile}
 
-### Probability and distributions
+## Probability and distributions
 
 Understand the following concepts:
 
@@ -157,7 +157,7 @@ probs<-dbinom(0:5,5,0.2)
 sum(x*probs)
 ```
 
-### Continuous distributions
+## Continuous distributions
 
 Understand the differences between discrete and continuous probability distributions.
 
@@ -189,7 +189,10 @@ $$ {#eq-Z}
 Imagine the following are different lengths of the lizard *Scelloporus gramicus:*
 
 ```{r}
-length_Scelloporus<-c(49.79345, 48.27289, 47.01204, 50.04918, 33.23075, 36.95524, 45.49277, 44.33337, 40.92777, 40.02123)
+length_Scelloporus<-c(49.79345, 48.27289, 47.01204,
+                      50.04918, 33.23075, 36.95524,
+                      45.49277, 44.33337, 40.92777,
+                      40.02123)
 ```
 
 \importantbox{Q8. 2 pts. Estimate the z values for each observation}
@@ -209,7 +212,7 @@ Why is the Central Limit Theorem important when estimating confidence intervals?
 
 What is a confidence interval? How is it estimated?
 
-### Null Hypothesis Statistical Testing
+## Null Hypothesis Statistical Testing
 
 You should be able to define:
 
@@ -241,7 +244,8 @@ You should be able to look at an output like the following (from the teporingos 
 
 ```{r}
 teporingospaired<-read.csv("teporingospaired.csv")
-t.test(teporingospaired$diet, teporingospaired$original, paired=T, alternative='two.sided')
+t.test(teporingospaired$diet, teporingospaired$original,
+       paired=T, alternative='two.sided')
 
 ```
 
@@ -249,7 +253,7 @@ and interpret it.
 
 \importantbox{Q9. 2 pts. Interpret the output for the teporingos data. Define the null and alternative hypothesis, as well as the decision.}
 
-### Linear models
+## Linear models
 
 Understand the structure of a linear model. Particularly, the following equation:
 
@@ -275,7 +279,7 @@ Be able to interpret the output of a linear model.
 
 Understand multicollinearity and why it can be undesirable.
 
-### Multiple linear regression
+## Multiple linear regression
 
 **The lecture for this topic will be on Wednesday 28 and Friday 1st**
 
@@ -287,7 +291,7 @@ summary(lm(Petal.Length~Petal.Width*Species,data=iris))
 
 \importantbox{Q10. 2 pts. What is the predicted petal length for an individual from the Setosa family with a petal width of 2}
 
-### Model selection, AIC and Maximum Likelihood
+## Model selection, AIC and Maximum Likelihood
 
 **Lecture Monday 4th**
 
