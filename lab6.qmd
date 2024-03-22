@@ -1,0 +1,220 @@
+---
+title: "Lab 6"
+author: "Dr. Alejandro Molina-Moctezuma (based on Dr. Rushing's lab)"
+format: pdf
+editor: visual
+header-includes:
+  - \usepackage{awesomebox}
+  - \usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
+---
+
+## Count data and glmm
+
+Up to this point, we have been working on linear models, in which the response variable has been a continuous, normally distributed variable. For today's lab we will focus on Generalized Linear Model (called so, because it generalizes the linear regression using a link function, see the slides for week 8!)
+
+I will be borrowing from Dr. Clark Rushing <https://warnell.uga.edu/directory/people/clark-rushing> for this lab, taken from his **FANR 6750** course.
+
+### Dataset
+
+Let’s take a look at a data example to demonstrate this concept. The data are modified from [Ver Hoef and Boveng 2007](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1141&context=usdeptcommercepub) and include 400 observed counts of harbor seals from aerial surveys conducted in coastal Alaska.
+
+Download the harbordata.csv from the files tab in Canvas, and load it into an object called harbordata.
+
+```{r echo = F}
+library(FANR6750)
+data("harbordata")
+```
+
+After you have downloaded it, let's explore it
+
+```{r}
+head(harbordata)
+```
+
+And finally... let's visualize it.
+
+We will use the ggplot package. If you have never used it, let's download it:
+
+```{r eval=F}
+install.packages("ggplot2")
+```
+
+You only need to install a package once in your computer.
+
+Then, let's load the package
+
+```{r}
+library(ggplot2)
+```
+
+And finally, let's plot the data:
+
+```{r}
+ggplot() +
+  geom_point(data = harbordata, aes(x = Reltolow, y = Number)) +
+  scale_y_continuous("Count") +
+  scale_x_continuous("Tide relative to low (m)")
+```
+
+Remember, this data includes aerial observations of seals
+
+![](images/clipboard-991639687.png)
+
+Looking at the plot, it seems like there are a ton ob observation in which 0 individuals were seen, and some in which up to 12 were seen. This might be a bit overdispersed for a Poisson distribution, but we'll worry about that later!
+
+### Running a simple linear model
+
+First off, let's look at what would happen if we ran a simple linear model. Hopefully you know how to do this by now.
+
+Run a linear model using the "lm" function, in which Number is the response variable, and Reltolow is the explanatory variable using the harbordata dataset.
+
+```{r echo=F}
+mod1 <- lm(Number~ Reltolow, data= harbordata)
+```
+
+While this model is significant, we know there's some stuff wrong with it (or, at least, you should know it!)
+
+Let's add this model prediction to the plot:
+
+```{r}
+model_pred <- predict(mod1)
+
+ggplot() +
+  geom_point(data = harbordata, aes(x = Reltolow, y = Number)) +
+  geom_line(aes(harbordata$Reltolow, model_pred), color= 'red') + 
+  scale_y_continuous("Count") +
+  scale_x_continuous("Tide relative to low (m)")
+```
+
+Uggh, this is not good.
+
+But remember! We can use a link function to estimate a different response. In this case:
+
+$$
+log(\lambda_i) = \beta_0 + \beta_1x_{i1} + \beta_2x_{i2} + \cdots + \beta_px_{ip}
+$$
+
+Now, that doesn't have a random component. In this case, the random component is given by:
+
+$$
+y_i \sim Poisson(\lambda_i)
+$$
+
+One last problem... that random component uses $\lambda_i$, not $log(\lambda_i)$. Well, to obtain $\lambda_i$ we simply use:
+
+$$
+\lambda_i = e^{\beta_0} + e^{\beta_1x_{i1}} + e^{\beta_2x_{i2}} + \cdots + e^{\beta_zx_{zp}}
+$$
+
+Fortunately, we don't have to worry about anything other that knowing which link function to use.
+
+Let's run the same model, but using a GLM:
+
+```{r}
+fm2 <- glm(Number ~ Reltolow, family = poisson(link = "log"), data = harbordata)
+summary(fm2)
+```
+
+New things in this function: family, and link!
+
+This model is looking at the effect of flow, but maybe substrate type is also affecting the number of observed seals. Let's run it:
+
+```{r}
+fm3 <- glm(Number ~ substrate + Reltolow, family = poisson(link = "log"),
+           data = harbordata)
+summary(fm3)
+```
+
+The GLM summary gives us an AIC value. Based on this value, which of the two models is better?
+
+\importantbox{Q1. 2 pts. Which of the two models do you think explains the observed data better? Why? save the model in a new object called "smodel"}
+
+```{r echo=F}
+smodel<-fm3
+```
+
+Let's use predict to plot the better model. We will only plot it for one type of substrate
+
+```{r}
+predData <- data.frame(Reltolow = seq(min(harbordata$Reltolow),
+                                      max(harbordata$Reltolow), length = 10000), 
+                       substrate= 'ice')
+
+pred.link <- predict(smodel, newdata = predData, se.fit = TRUE)
+predData$lambda <- exp(pred.link$fit) # exp is the inverse-link function
+predData$lower <- exp(pred.link$fit - 1.96 * pred.link$se.fit)
+predData$upper <- exp(pred.link$fit + 1.96 * pred.link$se.fit)
+
+ggplot() +
+  geom_point(data = harbordata, aes(x = Reltolow, y = Number)) +
+  geom_path(data = predData, aes(x = Reltolow, y = lambda), color= 'red') +
+  geom_ribbon(data = predData, aes(x = Reltolow, ymin = lower, ymax = upper),
+              fill = NA, color = "red", linetype= 'dashed') +
+  scale_x_continuous("Tide relative to low (m)") +
+  scale_y_continuous("Expected count")
+```
+
+Do you think this looks OK? Look at the (tiny) confident intervals compared to the great spread of the data!
+
+Remember that I mentioned that the data looked a bit overdispersed? In Poisson, the mean and the variance are equal. That's why as $\lambda$ increases, so does the spread of the data.
+
+\importantbox{Q2. 4 pts. Estimate the mean and the variance of the "number" variablein the dataframe. Do you think there is overdispersion?}
+
+A long time ago, I talked about the use of negative binomial instead of Poisson when there is overdispersion. It allows us a lot more flexibility!
+
+To run a glm using the negative binomial, we need a new package. Download the "MASS" package.
+
+And now, let's run the code!
+
+We will
+
+1.  Run the NB model
+2.  Look at the summary
+3.  Obtain the predictors to plot
+4.  Plot!
+5.  Add the Poisson model to the plot
+
+```{r}
+library(MASS)
+nb1 <- glm.nb(Number ~ substrate + Reltolow, data = harbordata)
+summary(nb1)
+
+predDatanb <- data.frame(Reltolow = seq(min(harbordata$Reltolow),
+                                        max(harbordata$Reltolow), length = 10000),
+                         substrate= 'ice')
+
+pred.linknb <- predict(nb1, newdata = predDatanb, se.fit = TRUE)
+predDatanb$lambda <- exp(pred.linknb$fit) # exp is the inverse-link function
+predDatanb$lower <- exp(pred.linknb$fit - 1.96 * pred.linknb$se.fit)
+predDatanb$upper <- exp(pred.linknb$fit + 1.96 * pred.linknb$se.fit)
+
+ggplot() +
+  geom_point(data = harbordata, aes(x = Reltolow, y = Number)) +
+  geom_path(data = predData, aes(x = Reltolow, y = lambda, color= 'Poisson')) +
+  geom_ribbon(data = predData, aes(x = Reltolow, ymin = lower,
+                                   ymax = upper, color= 'Poisson'),
+              fill = NA, linetype= 'dashed') +
+  geom_path(data = predDatanb, aes(x = Reltolow, y = lambda,
+                                   color= 'Negative Binomial')) +
+  geom_ribbon(data = predDatanb, aes(x = Reltolow, ymin = lower, ymax = upper,
+              color= 'Negative Binomial'), fill = NA, 
+              linetype= 'dashed') +
+  scale_x_continuous("Tide relative to low (m)") +
+  scale_y_continuous("Expected count")
+```
+
+Even though the CI is larger, this better represents the real world observations!
+
+Download the alligatordata.csv file.
+
+\importantbox{Q3. 12 pts. Estimate clutch size as a function of lenght, habitat, and length + habitat using both methods (Poisson and NB)}
+
+\importantbox{Q4. 4 pts. Choose the best model from Q3 and describe it}
+
+\importantbox{Q5. 6 pts. Use the poisson regression model to plot the relationship between number of eggs and female length, for all three habitat types, on the same graph. The graph should include points color coded by habitat, a legend and confidence intervals}
+
+\awesomebox[violet]{5pt}{\faRocket}{violet}{EXTRA CREDIT: up to 4 pts. Question 5 might be a bit hard for some of you. If you figure out a good way to plot it, start a new discussion in Canvas and share your plot/code. There are many ways to plot this, so, if you have an alternative way of plotting it, you can upload it even if someone else has done it already. You can also modify previous responses if you have suggestions on how to do it. In order to get the extra credit, you need to post by end of day Friday 29th. This is so we have a chance to help students working on this Question.}
+
+Total points: 28
+
+## 
